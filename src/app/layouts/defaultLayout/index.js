@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import * as router from 'react-router-dom';
-import { SidebarNav, SidebarBrand, HeaderNav, Content, Footer, NavBreadcrumb, SwitchToggle } from 'app/components/base';
+import { SidebarNav, SidebarBrand, HeaderNav, Content, Footer, NavBreadcrumb } from 'app/components/base';
 import RouteNavConfig from 'app/routes/config';
 import { makeSelectSidebarToggle } from 'app/redux/common/selector';
 

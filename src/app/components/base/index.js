@@ -6,5 +6,6 @@ import Content from './content';
 import Footer from './footer';
 import NavBreadcrumb from './breadcrumb';
 import SwitchToggle from './switchToggle';
+import MultiSelect from './multiSelect';
 
-export { SidebarNav, SidebarToggle, SidebarBrand, HeaderNav, Content, Footer, NavBreadcrumb, SwitchToggle };
+export { SidebarNav, SidebarToggle, SidebarBrand, HeaderNav, Content, Footer, NavBreadcrumb, SwitchToggle, MultiSelect };
