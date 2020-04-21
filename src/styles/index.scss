@@ -1,0 +1,74 @@
+@import 'scss/variables.scss';
+@import 'scss/component.scss';
+@import 'scss/buttonSwitch.scss';
+@import 'scss/sidebarNav.scss';
+@import 'scss/sidebarBrand.scss';
+@import 'scss/header.scss';
+@import 'scss/footer.scss';
+@import 'scss/custom.scss';
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    letter-spacing: normal;
+    font-size: 14px;
+    color: $hex-dark;
+    background-color: $hex-light;
+}
+
+#root {
+    height: 100%;
+    width: 100%;
+}
+
+.app-body {
+    flex-grow: 1;
+    transition: margin 0.3s;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        order: -1;
+        width: $sidebar-width;
+        margin-left: -$sidebar-width;
+        padding: 0;
+        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.35);
+        transition: box-shadow 0.3s 0.15s, margin-left 0.3s, margin-right 0.3s, width 0.3s, z-index 0s ease 0.3s, -webkit-transform 0.3s;
+        transition: box-shadow 0.3s 0.15s, transform 0.3s, margin-left 0.3s, margin-right 0.3s, width 0.3s, z-index 0s ease 0.3s;
+        transition: box-shadow 0.3s 0.15s, transform 0.3s, margin-left 0.3s, margin-right 0.3s, width 0.3s, z-index 0s ease 0.3s,
+            -webkit-transform 0.3s;
+        position: fixed;
+        z-index: 1019;
+        height: 100vh;
+        background-color: $sidebar-color;
+    }
+    .main {
+        display: flex;
+        min-height: 100vh;
+        transition: margin-left 0.35s ease-in-out, left 0.35s ease-in-out;
+        flex-direction: column;
+        flex: 1 1;
+        min-width: 0;
+
+        .content {
+            padding: 2.5rem 2.5rem 1.5rem;
+            flex: 1;
+        }
+    }
+    .sidebar {
+        &.sidebar-show {
+            flex: 0 0 $sidebar-width;
+            margin-left: 0;
+            ~ .main {
+                margin-left: $sidebar-width;
+            }
+        }
+    }
+}

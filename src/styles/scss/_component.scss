@@ -1,0 +1,18 @@
+.table {
+    color: $hex-dark;
+}
+
+a {
+    color: $hex-primary;
+    &:hover {
+        color: $hex-primary;
+        text-decoration: underline;
+    }
+}
+
+.button-toggle {
+    font-size: 1.4rem;
+    &:not(:disabled) {
+        cursor: pointer;
+    }
+}

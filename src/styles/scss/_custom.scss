@@ -1,0 +1,18 @@
+.dropdown-toggle {
+    &:after {
+        content: '';
+        margin-left: 0.255em;
+        vertical-align: 0.255em;
+        border: solid;
+        border-width: 0 2px 2px 0;
+        display: inline-block;
+        padding: 2px;
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+    &.no-carret {
+        &::after {
+            display: none;
+        }
+    }
+}
