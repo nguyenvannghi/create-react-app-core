@@ -74,13 +74,15 @@ const Home = () => {
                                 label="name"
                                 trackBy="name"
                                 multiple
-                                selectionLabel={
-                                    state1 && (
-                                        <a>
-                                            {state1.name} - {state1.language}
-                                        </a>
-                                    )
-                                }
+                                // selectionLabel={
+                                //     state1 &&
+                                //     state1.map((item, index) => (
+                                //         <a key={index}>
+                                //             {'/'}
+                                //             {item.name} - {item.language}
+                                //         </a>
+                                //     ))
+                                // }
                                 options={arrayDATA1}
                                 value={arrayDataSelected}
                                 onGetValues={onGetValues1}

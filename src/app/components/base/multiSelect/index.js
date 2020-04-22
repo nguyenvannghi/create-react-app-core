@@ -42,7 +42,7 @@ const MultiSelect = props => {
             .substr(2, 5),
     );
     const optionHoveredRef = useRef(null);
-    const [optionSelected, setOptionSelected] = useImmer(value);
+    const [optionSelected, setOptionSelected] = useImmer();
     const [optionBuilt, setOptionBuilt] = useImmer(options);
     const [state, dispatch] = useImmerReducer(multiSelectReducer, initialState);
 
@@ -97,7 +97,7 @@ const MultiSelect = props => {
         data => {
             setOptionSelected(draft => {
                 const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
-                const hasIndex = draft.findIndex(item => item[trackBy] === data[trackBy]);
+                const hasIndex = draft && draft.findIndex(item => item[trackBy] === data[trackBy]);
                 if (hasIndex !== -1) {
                     draft.splice(hasIndex, 1);
                     target &&
@@ -148,8 +148,8 @@ const MultiSelect = props => {
                 pushMultiOption(data);
             } else {
                 pushSingleOption(data);
+                dispatch({ type: RESET });
             }
-            dispatch({ type: RESET });
         },
         [dispatch, multiple, pushMultiOption, pushSingleOption],
     );
@@ -159,7 +159,7 @@ const MultiSelect = props => {
         onPushOptionSelected(data);
     };
 
-    const onCheckSelected = data => value.findIndex(item => item[trackBy] === data);
+    const onCheckSelected = data => value && (multiple ? value.findIndex(item => item[trackBy] === data) : value[trackBy] === data);
 
     const onMouseOverEnter = (e, data) => {
         optionHoveredRef.current = data;
@@ -228,6 +228,15 @@ const MultiSelect = props => {
             optionHoveredRef.current = null;
         };
     }, []);
+
+    useEffect(() => {
+        if (!value) {
+            const newState = multiple ? [] : {};
+            setOptionSelected(() => newState);
+        } else {
+            setOptionSelected(() => value);
+        }
+    }, [setOptionSelected, multiple, value]);
 
     useEffect(() => {
         if (!state[FIELDS_STATE.DROPDOWN]) {
@@ -304,7 +313,6 @@ MultiSelect.defaultProps = {
     placeholder: 'Select option',
     trackBy: 'key',
     label: 'value',
-    value: [],
     selectLabel: 'Press enter to select',
     selectedLabel: 'Selected',
     deselectLabel: 'Press enter to remove',
@@ -326,7 +334,7 @@ MultiSelect.propTypes = {
     trackBy: PropTypes.string,
     label: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
-    selectionView: PropTypes.node,
+    selectionLabel: PropTypes.node,
     selectLabel: PropTypes.string,
     selectedLabel: PropTypes.string,
     deselectLabel: PropTypes.string,
