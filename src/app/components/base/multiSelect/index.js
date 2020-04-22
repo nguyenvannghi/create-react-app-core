@@ -42,6 +42,9 @@ const MultiSelect = props => {
         if (disabled) {
             return;
         }
+        window.setTimeout(() => {
+            document.getElementById('multiselect_input').focus();
+        }, 0);
         dispatch({ type: SET_DROPDOWN, [FIELDS_STATE.DROPDOWN]: !state[FIELDS_STATE.DROPDOWN] });
         handleAbove();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,6 +170,12 @@ const MultiSelect = props => {
     }, []);
 
     useEffect(() => {
+        if (!state[FIELDS_STATE.DROPDOWN]) {
+            setOptionBuilt(() => options);
+        }
+    }, [state, setOptionBuilt, options]);
+
+    useEffect(() => {
         window.addEventListener('keydown', e => {
             const code = e.keyCode || e.charCode;
             if (code === 13 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef) {
@@ -204,6 +213,7 @@ const MultiSelect = props => {
             <div className="multiselect_tags" onClick={handleDropdown}>
                 {state[FIELDS_STATE.DROPDOWN] ? (
                     <input
+                        id="multiselect_input"
                         name={name}
                         type="text"
                         autoComplete="off"
