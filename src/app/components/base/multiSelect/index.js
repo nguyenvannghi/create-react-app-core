@@ -72,7 +72,11 @@ const MultiSelect = props => {
         }
         setOptionBuilt(draft => {
             const state = draft.filter(item => {
-                return item[trackBy].toLowerCase().indexOf(value.toLowerCase()) > -1;
+                let key = trackBy;
+                if (label) {
+                    key = label;
+                }
+                return item[key].toLowerCase().indexOf(value.toLowerCase()) > -1;
             });
             return state;
         });
@@ -80,9 +84,6 @@ const MultiSelect = props => {
 
     const onPushOptionSelected = useCallback(
         data => {
-            if (!data) {
-                return;
-            }
             const target = document.getElementById(`${CLASSLIST.OPTION}-${data[trackBy]}`);
             setListSelected(draft => {
                 const hasIndex = draft.findIndex(item => item[trackBy] === data[trackBy]);
@@ -112,8 +113,6 @@ const MultiSelect = props => {
 
     const onCheckSelected = data => value.findIndex(item => item[trackBy] === data);
 
-    const onCheckHighlight = data => options.findIndex(item => item[trackBy] === data);
-
     const onMouseOverEnter = (e, data) => {
         optionHoveredRef.current = data;
         Array.from(e.target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
@@ -124,27 +123,6 @@ const MultiSelect = props => {
         Array.from(e.target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
             e.target.classList.remove(CLASSLIST.HIGHLIGHT);
     };
-
-    const indexOfObject = (array, property, value) => {
-        if (!array || array.length === 0 || !value) {
-            return -1;
-        }
-        let index = -1;
-        for (let i = 0; i < array.length; i += 1) {
-            if (array[i][property] && array[i][property] === value[property]) {
-                index = i;
-            }
-        }
-        return index;
-    };
-
-    const getActiveSuggestionIndex = useCallback(() => {
-        let index = -1;
-        if (optionHoveredRef) {
-            index = indexOfObject(options, label || trackBy, optionHoveredRef.current);
-        }
-        return index;
-    }, [label, trackBy, options]);
 
     const optionsRender = () => {
         return optionBuilt.length > 0 ? (
@@ -190,60 +168,15 @@ const MultiSelect = props => {
 
     useEffect(() => {
         window.addEventListener('keydown', e => {
-            e.preventDefault();
             const code = e.keyCode || e.charCode;
-
             if (code === 13 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef) {
                 onPushOptionSelected(optionHoveredRef.current);
-            } else if (code === 38 || code === 38) {
-                const suggestionIndex = getActiveSuggestionIndex();
-                let data;
-                if (suggestionIndex === -1) {
-                    data = options[0];
-                    return;
-                }
-                if (suggestionIndex === 0) {
-                    // Go to the last suggestion
-                    data = options[options.length - 1];
-                } else {
-                    // Decrement the suggestion index
-                    data = options[suggestionIndex - 1];
-                }
-                optionHoveredRef.current = data;
-                console.log(data);
-                if (data) {
-                    const target = document.getElementById(`${CLASSLIST.OPTION}-${data[trackBy]}`);
-                    Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
-                        Array.from(target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
-                        target.classList.add(CLASSLIST.HIGHLIGHT);
-                }
-            } else if (code === 40 || code === 40) {
-                const suggestionIndex = getActiveSuggestionIndex();
-                let data;
-                if (suggestionIndex === -1) {
-                    data = options[0];
-                    return;
-                }
-                if (suggestionIndex === 0) {
-                    // Go to the last suggestion
-                    data = options[options.length - 1];
-                } else {
-                    // Increment the suggestion index
-                    data = options[suggestionIndex + 1];
-                }
-                optionHoveredRef.current = data;
-                if (data) {
-                    const target = document.getElementById(`${CLASSLIST.OPTION}-${data[trackBy]}`);
-                    Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
-                        Array.from(target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
-                        target.classList.add(CLASSLIST.HIGHLIGHT);
-                }
             }
         });
         return () => {
             window.removeEventListener('keydown', () => {});
         };
-    }, [dispatch, state, optionHoveredRef, onPushOptionSelected, getActiveSuggestionIndex, options]);
+    }, [dispatch, state, onPushOptionSelected]);
 
     useEffect(() => {
         window.addEventListener('scroll', handleAbove);
