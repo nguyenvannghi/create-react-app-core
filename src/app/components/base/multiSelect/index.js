@@ -7,6 +7,7 @@ import { SET_ABOVE, SET_DROPDOWN, RESET, FIELDS_STATE } from './const';
 import multiSelectReducer, { initialState } from './reducer';
 
 const CLASSLIST = {
+    INPUT: 'multiselect_input',
     OPTION: 'multiselect_option',
     SELECTED: 'multiselect_option-selected',
     HIGHLIGHT: 'multiselect_option-highlight',
@@ -17,6 +18,7 @@ const MultiSelect = props => {
         className,
         tag: Element,
         name,
+        multiple,
         tabIndex,
         onGetValues,
         options,
@@ -26,6 +28,7 @@ const MultiSelect = props => {
         trackBy,
         disabled,
         searchable,
+        selectionLabel,
         selectLabel,
         selectedLabel,
         deselectLabel,
@@ -33,8 +36,13 @@ const MultiSelect = props => {
         noResult,
     } = props;
     const dropdownRef = useRef(null);
+    const elementKeyRef = useRef(
+        Math.random()
+            .toString(36)
+            .substr(2, 5),
+    );
     const optionHoveredRef = useRef(null);
-    const [listSelected, setListSelected] = useImmer(value);
+    const [optionSelected, setOptionSelected] = useImmer(value);
     const [optionBuilt, setOptionBuilt] = useImmer(options);
     const [state, dispatch] = useImmerReducer(multiSelectReducer, initialState);
 
@@ -43,7 +51,7 @@ const MultiSelect = props => {
             return;
         }
         window.setTimeout(() => {
-            document.getElementById('multiselect_input').focus();
+            document.getElementById(CLASSLIST.INPUT).focus();
         }, 0);
         dispatch({ type: SET_DROPDOWN, [FIELDS_STATE.DROPDOWN]: !state[FIELDS_STATE.DROPDOWN] });
         handleAbove();
@@ -85,28 +93,65 @@ const MultiSelect = props => {
         });
     };
 
-    const onPushOptionSelected = useCallback(
+    const pushMultiOption = useCallback(
         data => {
-            const target = document.getElementById(`${CLASSLIST.OPTION}-${data[trackBy]}`);
-            setListSelected(draft => {
+            setOptionSelected(draft => {
+                const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
                 const hasIndex = draft.findIndex(item => item[trackBy] === data[trackBy]);
                 if (hasIndex !== -1) {
                     draft.splice(hasIndex, 1);
                     target &&
                         target.classList &&
-                        Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
+                        Array.from(target.classList).indexOf(CLASSLIST.SELECTED) > -1 &&
                         target.classList.remove(CLASSLIST.SELECTED);
                 } else {
                     draft.push(data);
-                    target &&
-                        target.classList &&
-                        Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
-                        target.classList.add(CLASSLIST.SELECTED, CLASSLIST.HIGHLIGHT);
+                    target && target.classList && target.classList.add(CLASSLIST.SELECTED, CLASSLIST.HIGHLIGHT);
                 }
                 return draft;
             });
         },
-        [setListSelected, trackBy],
+        [setOptionSelected, trackBy],
+    );
+
+    const pushSingleOption = useCallback(
+        data => {
+            setOptionSelected(draft => {
+                const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
+                if (draft && draft[trackBy]) {
+                    const prevTarget = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${draft[trackBy]}`);
+                    prevTarget &&
+                        prevTarget.classList &&
+                        Array.from(target.classList).indexOf(CLASSLIST.SELECTED) > -1 &&
+                        prevTarget.classList.remove(CLASSLIST.SELECTED);
+                }
+                if (draft && draft[trackBy] === data[trackBy]) {
+                    target &&
+                        target.classList &&
+                        Array.from(target.classList).indexOf(CLASSLIST.SELECTED) > -1 &&
+                        target.classList.remove(CLASSLIST.SELECTED);
+                    return null;
+                }
+                target && target.classList && target.classList.add(CLASSLIST.SELECTED, CLASSLIST.HIGHLIGHT);
+                return data;
+            });
+        },
+        [setOptionSelected, trackBy],
+    );
+
+    const onPushOptionSelected = useCallback(
+        data => {
+            if (!data) {
+                return;
+            }
+            if (multiple) {
+                pushMultiOption(data);
+            } else {
+                pushSingleOption(data);
+            }
+            dispatch({ type: RESET });
+        },
+        [dispatch, multiple, pushMultiOption, pushSingleOption],
     );
 
     const onSelect = (e, data) => {
@@ -118,13 +163,28 @@ const MultiSelect = props => {
 
     const onMouseOverEnter = (e, data) => {
         optionHoveredRef.current = data;
-        Array.from(e.target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
-            Array.from(e.target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
-            e.target.classList.add(CLASSLIST.HIGHLIGHT);
+        const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
+        target &&
+            target.classList &&
+            Array.from(target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
+            target.classList.add(CLASSLIST.HIGHLIGHT);
     };
     const onMouseLeave = (e, data) => {
-        Array.from(e.target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
-            e.target.classList.remove(CLASSLIST.HIGHLIGHT);
+        const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
+        target && target.classList && target.classList.remove(CLASSLIST.HIGHLIGHT);
+    };
+
+    const selectionMultiViewRender = () => selectionLabel || (optionSelected.length > 0 && `${optionSelected.length} options selected`);
+
+    const selectionViewSingleRender = () => {
+        return selectionLabel || optionSelected[label || trackBy];
+    };
+
+    const selectionViewRender = () => {
+        if (!optionSelected || (optionSelected && optionSelected.length === 0)) {
+            return <span className="multiselect_single">{placeholder}</span>;
+        }
+        return <span className="multiselect_single">{multiple ? selectionMultiViewRender() : selectionViewSingleRender()}</span>;
     };
 
     const optionsRender = () => {
@@ -142,10 +202,10 @@ const MultiSelect = props => {
                         onMouseDown={event => onMouseOverEnter(event, item)}
                         className={classNames(
                             CLASSLIST.OPTION,
-                            `${CLASSLIST.OPTION}-${item[trackBy]}`,
+                            `${CLASSLIST.OPTION}-${elementKeyRef.current}-${item[trackBy]}`,
                             onCheckSelected(item[trackBy]) > -1 && CLASSLIST.SELECTED,
                         )}
-                        id={classNames(`${CLASSLIST.OPTION}-${item[trackBy]}`)}
+                        id={classNames(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${item[trackBy]}`)}
                         onClick={event => onSelect(event, item)}>
                         {item[label]}
                     </span>
@@ -172,6 +232,7 @@ const MultiSelect = props => {
     useEffect(() => {
         if (!state[FIELDS_STATE.DROPDOWN]) {
             setOptionBuilt(() => options);
+            optionHoveredRef.current = null;
         }
     }, [state, setOptionBuilt, options]);
 
@@ -180,10 +241,11 @@ const MultiSelect = props => {
             const code = e.keyCode || e.charCode;
             if (code === 13 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef) {
                 onPushOptionSelected(optionHoveredRef.current);
+                e.preventDefault();
             }
         });
         return () => {
-            window.removeEventListener('keydown', () => {});
+            !state[FIELDS_STATE.DROPDOWN] && window.removeEventListener('keydown', () => {});
         };
     }, [dispatch, state, onPushOptionSelected]);
 
@@ -195,8 +257,8 @@ const MultiSelect = props => {
     }, [handleAbove]);
 
     useEffect(() => {
-        onGetValues(listSelected);
-    }, [listSelected, onGetValues]);
+        onGetValues(optionSelected);
+    }, [optionSelected, onGetValues]);
 
     return (
         <Element
@@ -213,7 +275,7 @@ const MultiSelect = props => {
             <div className="multiselect_tags" onClick={handleDropdown}>
                 {state[FIELDS_STATE.DROPDOWN] ? (
                     <input
-                        id="multiselect_input"
+                        id={CLASSLIST.INPUT}
                         name={name}
                         type="text"
                         autoComplete="off"
@@ -221,12 +283,10 @@ const MultiSelect = props => {
                         placeholder={placeholder}
                         onChange={onPopulateSuggestions}
                         tabIndex="0"
-                        className={classNames('multiselect_input', searchable && 'allow')}
+                        className={classNames(CLASSLIST.INPUT, searchable && 'allow')}
                     />
                 ) : (
-                    <span className="multiselect_single">
-                        {listSelected.length > 0 ? `${listSelected.length} options selected` : placeholder}
-                    </span>
+                    selectionViewRender()
                 )}
             </div>
             <div className="multiselect_content-wrapper">
@@ -238,6 +298,7 @@ const MultiSelect = props => {
 
 MultiSelect.defaultProps = {
     tag: 'div',
+    multiple: false,
     tabIndex: 0,
     name: 'mutilselect_input',
     placeholder: 'Select option',
@@ -257,6 +318,7 @@ MultiSelect.propTypes = {
     className: PropTypes.string,
     tag: PropTypes.string,
     name: PropTypes.string,
+    multiple: PropTypes.bool,
     tabIndex: PropTypes.number,
     onGetValues: PropTypes.func,
     options: PropTypes.array,
@@ -264,6 +326,7 @@ MultiSelect.propTypes = {
     trackBy: PropTypes.string,
     label: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
+    selectionView: PropTypes.node,
     selectLabel: PropTypes.string,
     selectedLabel: PropTypes.string,
     deselectLabel: PropTypes.string,

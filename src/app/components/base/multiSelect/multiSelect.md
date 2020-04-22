@@ -16,6 +16,7 @@
 
 | **Name**          | **Type**              | **Default**                                            | **Description**                                                                                                            |
 | ----------------- | --------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| **multiple**      | `Boolean`             | false                                                  | Equivalent to the multiple attribute on a `<select>` input.                                                                |
 | **options**       | `Array`               | []                                                     | Array of available options: Objects, Strings or Integers. If array of objects, visible label will default to option.value. |
 | **trackBy**       | `String`              | key                                                    | Used to compare objects.                                                                                                   |
 | **label**         | `String`              | value                                                  | Label from option Object, that will be visible in the dropdown.                                                            |
