@@ -33,8 +33,8 @@ const MultiSelect = props => {
         noResult,
     } = props;
     const dropdownRef = useRef(null);
-    const [listSelected, setListSelected] = useImmer(value);
     const optionHoveredRef = useRef(null);
+    const [listSelected, setListSelected] = useImmer(value);
     const [optionBuilt, setOptionBuilt] = useImmer(options);
     const [state, dispatch] = useImmerReducer(multiSelectReducer, initialState);
 
@@ -79,17 +79,23 @@ const MultiSelect = props => {
     };
 
     const onPushOptionSelected = useCallback(
-        (target, data) => {
+        data => {
+            if (!data) {
+                return;
+            }
+            const target = document.getElementById(`${CLASSLIST.OPTION}-${data[trackBy]}`);
             setListSelected(draft => {
                 const hasIndex = draft.findIndex(item => item[trackBy] === data[trackBy]);
                 if (hasIndex !== -1) {
                     draft.splice(hasIndex, 1);
-                    target.classList &&
+                    target &&
+                        target.classList &&
                         Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
                         target.classList.remove(CLASSLIST.SELECTED);
                 } else {
                     draft.push(data);
-                    target.classList &&
+                    target &&
+                        target.classList &&
                         Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
                         target.classList.add(CLASSLIST.SELECTED, CLASSLIST.HIGHLIGHT);
                 }
@@ -101,21 +107,44 @@ const MultiSelect = props => {
 
     const onSelect = (e, data) => {
         e.persist();
-        onPushOptionSelected(e.target, data);
+        onPushOptionSelected(data);
     };
 
     const onCheckSelected = data => value.findIndex(item => item[trackBy] === data);
 
-    const onMouseOver = (e, data) => {
-        optionHoveredRef.current = { target: e.target, data };
+    const onCheckHighlight = data => options.findIndex(item => item[trackBy] === data);
+
+    const onMouseOverEnter = (e, data) => {
+        optionHoveredRef.current = data;
         Array.from(e.target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
             Array.from(e.target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
             e.target.classList.add(CLASSLIST.HIGHLIGHT);
     };
-    const onMouseOut = (e, data) => {
+    const onMouseLeave = (e, data) => {
         Array.from(e.target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
             e.target.classList.remove(CLASSLIST.HIGHLIGHT);
     };
+
+    const indexOfObject = (array, property, value) => {
+        if (!array || array.length === 0 || !value) {
+            return -1;
+        }
+        let index = -1;
+        for (let i = 0; i < array.length; i += 1) {
+            if (array[i][property] && array[i][property] === value[property]) {
+                index = i;
+            }
+        }
+        return index;
+    };
+
+    const getActiveSuggestionIndex = useCallback(() => {
+        let index = -1;
+        if (optionHoveredRef) {
+            index = indexOfObject(options, label || trackBy, optionHoveredRef.current);
+        }
+        return index;
+    }, [label, trackBy, options]);
 
     const optionsRender = () => {
         return optionBuilt.length > 0 ? (
@@ -125,15 +154,17 @@ const MultiSelect = props => {
                         data-select={selectLabel}
                         data-selected={selectedLabel}
                         data-deselect={deselectLabel}
-                        onFocus={onMouseOver}
-                        onMouseEnter={event => onMouseOver(event, item)}
-                        onBlur={onMouseOut}
-                        onMouseLeave={event => onMouseOut(event, item)}
+                        onMouseEnter={event => onMouseOverEnter(event, item)}
+                        onMouseLeave={event => onMouseLeave(event, item)}
+                        onFocus={event => onMouseOverEnter(event, item)}
+                        onMouseOver={event => onMouseOverEnter(event, item)}
+                        onMouseDown={event => onMouseOverEnter(event, item)}
                         className={classNames(
                             CLASSLIST.OPTION,
                             `${CLASSLIST.OPTION}-${item[trackBy]}`,
                             onCheckSelected(item[trackBy]) > -1 && CLASSLIST.SELECTED,
                         )}
+                        id={classNames(`${CLASSLIST.OPTION}-${item[trackBy]}`)}
                         onClick={event => onSelect(event, item)}>
                         {item[label]}
                     </span>
@@ -145,7 +176,6 @@ const MultiSelect = props => {
             </li>
         );
     };
-
     const noOptionsRender = () => (
         <li className="multiselect_element">
             <span className="multiselect_option">{noOptions}</span>
@@ -160,18 +190,60 @@ const MultiSelect = props => {
 
     useEffect(() => {
         window.addEventListener('keydown', e => {
+            e.preventDefault();
             const code = e.keyCode || e.charCode;
+
             if (code === 13 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef) {
-                const {
-                    current: { target, data },
-                } = optionHoveredRef;
-                onPushOptionSelected(target, data);
+                onPushOptionSelected(optionHoveredRef.current);
+            } else if (code === 38 || code === 38) {
+                const suggestionIndex = getActiveSuggestionIndex();
+                let data;
+                if (suggestionIndex === -1) {
+                    data = options[0];
+                    return;
+                }
+                if (suggestionIndex === 0) {
+                    // Go to the last suggestion
+                    data = options[options.length - 1];
+                } else {
+                    // Decrement the suggestion index
+                    data = options[suggestionIndex - 1];
+                }
+                optionHoveredRef.current = data;
+                console.log(data);
+                if (data) {
+                    const target = document.getElementById(`${CLASSLIST.OPTION}-${data[trackBy]}`);
+                    Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
+                        Array.from(target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
+                        target.classList.add(CLASSLIST.HIGHLIGHT);
+                }
+            } else if (code === 40 || code === 40) {
+                const suggestionIndex = getActiveSuggestionIndex();
+                let data;
+                if (suggestionIndex === -1) {
+                    data = options[0];
+                    return;
+                }
+                if (suggestionIndex === 0) {
+                    // Go to the last suggestion
+                    data = options[options.length - 1];
+                } else {
+                    // Increment the suggestion index
+                    data = options[suggestionIndex + 1];
+                }
+                optionHoveredRef.current = data;
+                if (data) {
+                    const target = document.getElementById(`${CLASSLIST.OPTION}-${data[trackBy]}`);
+                    Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
+                        Array.from(target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
+                        target.classList.add(CLASSLIST.HIGHLIGHT);
+                }
             }
         });
         return () => {
             window.removeEventListener('keydown', () => {});
         };
-    }, [dispatch, state, optionHoveredRef, onPushOptionSelected]);
+    }, [dispatch, state, optionHoveredRef, onPushOptionSelected, getActiveSuggestionIndex, options]);
 
     useEffect(() => {
         window.addEventListener('scroll', handleAbove);
