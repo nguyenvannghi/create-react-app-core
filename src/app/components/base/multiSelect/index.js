@@ -7,6 +7,7 @@ import { SET_ABOVE, SET_DROPDOWN, RESET, FIELDS_STATE } from './const';
 import multiSelectReducer, { initialState } from './reducer';
 
 const CLASSLIST = {
+    OPTION: 'multiselect_option',
     SELECTED: 'multiselect_option-selected',
     HIGHLIGHT: 'multiselect_option-highlight',
 };
@@ -33,6 +34,7 @@ const MultiSelect = props => {
     } = props;
     const dropdownRef = useRef(null);
     const [listSelected, setListSelected] = useImmer(value);
+    const optionHoveredRef = useRef(null);
     const [optionBuilt, setOptionBuilt] = useImmer(options);
     const [state, dispatch] = useImmerReducer(multiSelectReducer, initialState);
 
@@ -58,7 +60,7 @@ const MultiSelect = props => {
         dispatch({ type: RESET });
     });
 
-    const onSearchOption = event => {
+    const onPopulateSuggestions = event => {
         const {
             target: { value },
         } = event;
@@ -75,31 +77,101 @@ const MultiSelect = props => {
             return state;
         });
     };
-    // console.log(optionBuilt);
-    const onSelect = (event, data) => {
-        event.persist();
-        setListSelected(draft => {
-            const hasIndex = draft.findIndex(item => item[trackBy] === data[trackBy]);
 
-            if (hasIndex !== -1) {
-                draft.splice(hasIndex, 1);
-                event.target.classList.remove(CLASSLIST.SELECTED);
-            } else {
-                draft.push(data);
-                event.target.classList.add(CLASSLIST.SELECTED, CLASSLIST.HIGHLIGHT);
-            }
-            return draft;
-        });
+    const onPushOptionSelected = useCallback(
+        (target, data) => {
+            setListSelected(draft => {
+                const hasIndex = draft.findIndex(item => item[trackBy] === data[trackBy]);
+                if (hasIndex !== -1) {
+                    draft.splice(hasIndex, 1);
+                    target.classList &&
+                        Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
+                        target.classList.remove(CLASSLIST.SELECTED);
+                } else {
+                    draft.push(data);
+                    target.classList &&
+                        Array.from(target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
+                        target.classList.add(CLASSLIST.SELECTED, CLASSLIST.HIGHLIGHT);
+                }
+                return draft;
+            });
+        },
+        [setListSelected, trackBy],
+    );
+
+    const onSelect = (e, data) => {
+        e.persist();
+        onPushOptionSelected(e.target, data);
     };
 
     const onCheckSelected = data => value.findIndex(item => item[trackBy] === data);
 
-    const onMouseOver = event => {
-        Array.from(event.target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 && event.target.classList.add(CLASSLIST.HIGHLIGHT);
+    const onMouseOver = (e, data) => {
+        optionHoveredRef.current = { target: e.target, data };
+        Array.from(e.target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
+            Array.from(e.target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
+            e.target.classList.add(CLASSLIST.HIGHLIGHT);
     };
-    const onMouseOut = event => {
-        Array.from(event.target.classList).indexOf(CLASSLIST.HIGHLIGHT) > -1 && event.target.classList.remove(CLASSLIST.HIGHLIGHT);
+    const onMouseOut = (e, data) => {
+        Array.from(e.target.classList).indexOf(`${CLASSLIST.OPTION}-${data[trackBy]}`) > -1 &&
+            e.target.classList.remove(CLASSLIST.HIGHLIGHT);
     };
+
+    const optionsRender = () => {
+        return optionBuilt.length > 0 ? (
+            optionBuilt.map((item, index) => (
+                <li key={index} role="presentation" className="multiselect_element">
+                    <span
+                        data-select={selectLabel}
+                        data-selected={selectedLabel}
+                        data-deselect={deselectLabel}
+                        onFocus={onMouseOver}
+                        onMouseEnter={event => onMouseOver(event, item)}
+                        onBlur={onMouseOut}
+                        onMouseLeave={event => onMouseOut(event, item)}
+                        className={classNames(
+                            CLASSLIST.OPTION,
+                            `${CLASSLIST.OPTION}-${item[trackBy]}`,
+                            onCheckSelected(item[trackBy]) > -1 && CLASSLIST.SELECTED,
+                        )}
+                        onClick={event => onSelect(event, item)}>
+                        {item[label]}
+                    </span>
+                </li>
+            ))
+        ) : (
+            <li className="multiselect_element">
+                <span className="multiselect_option">{noResult}</span>
+            </li>
+        );
+    };
+
+    const noOptionsRender = () => (
+        <li className="multiselect_element">
+            <span className="multiselect_option">{noOptions}</span>
+        </li>
+    );
+
+    useEffect(() => {
+        return () => {
+            optionHoveredRef.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener('keydown', e => {
+            const code = e.keyCode || e.charCode;
+            if (code === 13 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef) {
+                const {
+                    current: { target, data },
+                } = optionHoveredRef;
+                onPushOptionSelected(target, data);
+            }
+        });
+        return () => {
+            window.removeEventListener('keydown', () => {});
+        };
+    }, [dispatch, state, optionHoveredRef, onPushOptionSelected]);
 
     useEffect(() => {
         window.addEventListener('scroll', handleAbove);
@@ -132,7 +204,7 @@ const MultiSelect = props => {
                         autoComplete="off"
                         readOnly={!searchable}
                         placeholder={placeholder}
-                        onChange={onSearchOption}
+                        onChange={onPopulateSuggestions}
                         tabIndex="0"
                         className={classNames('multiselect_input', searchable && 'allow')}
                     />
@@ -143,30 +215,7 @@ const MultiSelect = props => {
                 )}
             </div>
             <div className="multiselect_content-wrapper">
-                <ul className="multiselect_content">
-                    {optionBuilt ? (
-                        optionBuilt.map((item, index) => (
-                            <li key={index} role="presentation" className="multiselect_element">
-                                <span
-                                    data-select={selectLabel}
-                                    data-selected={selectedLabel}
-                                    data-deselect={deselectLabel}
-                                    onFocus={onMouseOver}
-                                    onMouseEnter={onMouseOver}
-                                    onBlur={onMouseOut}
-                                    onMouseLeave={onMouseOut}
-                                    className={classNames('multiselect_option', onCheckSelected(item[trackBy]) > -1 && CLASSLIST.SELECTED)}
-                                    onClick={event => onSelect(event, item)}>
-                                    {item[label]}
-                                </span>
-                            </li>
-                        ))
-                    ) : (
-                        <li>
-                            <span className="multiselect_option">{noOptions}</span>
-                        </li>
-                    )}
-                </ul>
+                <ul className="multiselect_content">{options.length > 0 ? optionsRender() : noOptionsRender()}</ul>
             </div>
         </Element>
     );

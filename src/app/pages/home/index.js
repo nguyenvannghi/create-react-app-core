@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { MultiSelect } from 'app/components/base';
@@ -16,14 +16,20 @@ const arrayDataSelected = [
 ];
 
 const Home = () => {
+    const [state, setstate] = useState(null);
     const onGetValues = data => {
-        // console.log(data);
+        setstate(() => data);
     };
     return (
         <div style={{ paddingTop: '20%', paddingBottom: '20%' }}>
             <Row>
                 <Col xl="6">
                     <MultiSelect label="name" trackBy="name" options={arrayDATA} value={arrayDataSelected} onGetValues={onGetValues} />
+                </Col>
+                <Col xl="6">
+                    <pre className=" language-json">
+                        <code className=" language-json">{JSON.stringify(state)}</code>
+                    </pre>
                 </Col>
             </Row>
         </div>
