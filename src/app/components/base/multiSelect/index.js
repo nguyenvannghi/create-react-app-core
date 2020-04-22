@@ -248,10 +248,10 @@ const MultiSelect = props => {
     useEffect(() => {
         window.addEventListener('keydown', e => {
             const code = e.keyCode || e.charCode;
-            if (code === 13 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef) {
+            if (code === 13 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef.current) {
                 onPushOptionSelected(optionHoveredRef.current);
-                e.preventDefault();
             }
+            e.preventDefault();
         });
         return () => {
             !state[FIELDS_STATE.DROPDOWN] && window.removeEventListener('keydown', () => {});
