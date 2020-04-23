@@ -90,6 +90,9 @@ const Home = () => {
                             <pre className="language-json mt-4">
                                 <code className=" language-json">{JSON.stringify(state1)}</code>
                             </pre>
+                            <pre className="language-json mt-4">
+                                <code className=" language-json">{state1 && state1.length}</code>
+                            </pre>
                         </Card.Body>
                     </Card>
                 </Col>
