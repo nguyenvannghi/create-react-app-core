@@ -13,6 +13,8 @@ const CLASSLIST = {
     HIGHLIGHT: 'multiselect_option-highlight',
 };
 
+const KEY_PRESS = [9, 13];
+
 const MultiSelect = props => {
     const {
         className,
@@ -42,7 +44,7 @@ const MultiSelect = props => {
             .substr(2, 5),
     );
     const optionHoveredRef = useRef(null);
-    const [optionSelected, setOptionSelected] = useImmer();
+    const [optionSelected, setOptionSelected] = useImmer(null);
     const [optionBuilt, setOptionBuilt] = useImmer(options);
     const [state, dispatch] = useImmerReducer(multiSelectReducer, initialState);
 
@@ -75,14 +77,8 @@ const MultiSelect = props => {
         const {
             target: { value },
         } = event;
-        if (!options.length === 0 || !value) {
-            setOptionBuilt(() => options);
-        }
-        if (value && value.length === 0) {
-            return;
-        }
-        setOptionBuilt(draft => {
-            const state = draft.filter(item => {
+        setOptionBuilt(() => {
+            const state = options.filter(item => {
                 let key = trackBy;
                 if (label) {
                     key = label;
@@ -159,7 +155,15 @@ const MultiSelect = props => {
         onPushOptionSelected(data);
     };
 
-    const onCheckSelected = data => value && (multiple ? value.findIndex(item => item[trackBy] === data) : value[trackBy] === data);
+    const onCheckSelected = data => {
+        if (!optionSelected) {
+            return -1;
+        }
+        if (multiple) {
+            return optionSelected.findIndex(item => item[trackBy] === data);
+        }
+        return optionSelected[trackBy] === data ? 1 : -1;
+    };
 
     const onMouseOverEnter = (e, data) => {
         optionHoveredRef.current = data;
@@ -223,15 +227,26 @@ const MultiSelect = props => {
         </li>
     );
 
-    useEffect(() => {
-        return () => {
-            optionHoveredRef.current = null;
-        };
+    const onSuggestionKeyDown = useCallback(
+        e => {
+            const code = e.keyCode || e.charCode;
+            if (KEY_PRESS.indexOf(code) > -1 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef) {
+                onPushOptionSelected(optionHoveredRef.current);
+                e.preventDefault();
+            }
+        },
+        [state, onPushOptionSelected],
+    );
+
+    const onSuggestionKeyUp = useCallback(e => {
+        const code = e.keyCode || e.charCode;
+        if (KEY_PRESS.indexOf(code) > -1) return;
+        e.preventDefault();
     }, []);
 
     useEffect(() => {
         if (!value) {
-            const newState = multiple ? [] : {};
+            const newState = multiple ? [] : null;
             setOptionSelected(() => newState);
         } else {
             setOptionSelected(() => value);
@@ -244,19 +259,6 @@ const MultiSelect = props => {
             optionHoveredRef.current = null;
         }
     }, [state, setOptionBuilt, options]);
-
-    useEffect(() => {
-        window.addEventListener('keydown', e => {
-            const code = e.keyCode || e.charCode;
-            if (code === 13 && state[FIELDS_STATE.DROPDOWN] && optionHoveredRef) {
-                onPushOptionSelected(optionHoveredRef.current);
-                e.preventDefault();
-            }
-        });
-        return () => {
-            !state[FIELDS_STATE.DROPDOWN] && window.removeEventListener('keydown', () => {});
-        };
-    }, [dispatch, state, onPushOptionSelected]);
 
     useEffect(() => {
         window.addEventListener('scroll', handleAbove);
@@ -291,6 +293,8 @@ const MultiSelect = props => {
                         readOnly={!searchable}
                         placeholder={placeholder}
                         onChange={onPopulateSuggestions}
+                        onKeyDown={onSuggestionKeyDown}
+                        onKeyUp={onSuggestionKeyUp}
                         tabIndex="0"
                         className={classNames(CLASSLIST.INPUT, searchable && 'allow')}
                     />
