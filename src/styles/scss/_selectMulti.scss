@@ -5,10 +5,6 @@
     font-size: 16px;
     -ms-touch-action: manipulation;
     touch-action: manipulation;
-    &.disabled {
-        background: #e8e8e8;
-        opacity: 0.8;
-    }
 }
 .multiselect {
     box-sizing: content-box;
@@ -199,6 +195,14 @@
             border-top-right-radius: 5px;
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
+        }
+    }
+
+    &.disabled {
+        .multiselect_tags,
+        .multiselect_single {
+            background: #e8e8e8;
+            opacity: 0.8;
         }
     }
 }

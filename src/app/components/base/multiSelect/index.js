@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect, useCallback } from 'react';
+import React, { memo, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useImmer, useImmerReducer } from 'use-immer';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -48,7 +48,7 @@ const MultiSelect = props => {
     const [optionBuilt, setOptionBuilt] = useImmer(options);
     const [state, dispatch] = useImmerReducer(multiSelectReducer, initialState);
 
-    const handleDropdown = useCallback(() => {
+    const handleDropdown = useCallback(e => {
         if (disabled) {
             return;
         }
@@ -57,6 +57,7 @@ const MultiSelect = props => {
         }, 0);
         dispatch({ type: SET_DROPDOWN, [FIELDS_STATE.DROPDOWN]: !state[FIELDS_STATE.DROPDOWN] });
         handleAbove();
+        e.preventDefault();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -101,8 +102,8 @@ const MultiSelect = props => {
                         Array.from(target.classList).indexOf(CLASSLIST.SELECTED) > -1 &&
                         target.classList.remove(CLASSLIST.SELECTED);
                 } else {
-                    draft.push(data);
                     target && target.classList && target.classList.add(CLASSLIST.SELECTED, CLASSLIST.HIGHLIGHT);
+                    draft.push(data);
                 }
                 return draft;
             });
@@ -170,7 +171,7 @@ const MultiSelect = props => {
         const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
         target &&
             target.classList &&
-            Array.from(target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
+            // Array.from(target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
             target.classList.add(CLASSLIST.HIGHLIGHT);
     };
     const onMouseLeave = (e, data) => {
@@ -178,12 +179,12 @@ const MultiSelect = props => {
         target && target.classList && target.classList.remove(CLASSLIST.HIGHLIGHT);
     };
 
-    const selectionMultiViewRender = () =>
-        selectionLabel(optionSelected) || (optionSelected.length > 0 && `${optionSelected.length} options selected`);
+    const selectionMultiViewRender = () => {
+        return selectionLabel ? selectionLabel(optionSelected) : optionSelected.length > 0 && `${optionSelected.length} options selected`;
+    };
 
     const selectionViewSingleRender = () => {
-        return selectionLabel({ ...optionSelected });
-        // return selectionLabel || optionSelected[label || trackBy];
+        return selectionLabel ? selectionLabel({ ...optionSelected }) : optionSelected[label || trackBy];
     };
 
     const selectionViewRender = () => {
@@ -193,7 +194,7 @@ const MultiSelect = props => {
         return <span className="multiselect_single">{multiple ? selectionMultiViewRender() : selectionViewSingleRender()}</span>;
     };
 
-    const optionsRender = () => {
+    const optionsRender = useMemo(() => {
         return optionBuilt.length > 0 ? (
             optionBuilt.map((item, index) => (
                 <li key={index} role="presentation" className="multiselect_element">
@@ -222,7 +223,8 @@ const MultiSelect = props => {
                 <span className="multiselect_option">{noResult}</span>
             </li>
         );
-    };
+    }, [optionBuilt, trackBy]);
+
     const noOptionsRender = () => (
         <li className="multiselect_element">
             <span className="multiselect_option">{noOptions}</span>
@@ -305,7 +307,7 @@ const MultiSelect = props => {
                 )}
             </div>
             <div className="multiselect_content-wrapper">
-                <ul className="multiselect_content">{options.length > 0 ? optionsRender() : noOptionsRender()}</ul>
+                <ul className="multiselect_content">{options.length > 0 ? optionsRender : noOptionsRender()}</ul>
             </div>
         </Element>
     );

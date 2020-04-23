@@ -44,7 +44,7 @@ const Home = () => {
                             <Card.Text>The basic single select / dropdown doesn’t require much configuration.</Card.Text>
                         </Card.Header>
                         <Card.Body>
-                            <MultiSelect
+                            {/* <MultiSelect
                                 options={arrayDATA2}
                                 onGetValues={onGetValues2}
                                 selectionLabel={props => (
@@ -52,7 +52,7 @@ const Home = () => {
                                         <strong>{props?.key}</strong> - {props?.value}
                                     </span>
                                 )}
-                            />
+                            /> */}
                             <pre className="language-json mt-4">
                                 <code className=" language-json">{JSON.stringify(state2)}</code>
                             </pre>
@@ -72,16 +72,16 @@ const Home = () => {
                                 label="name"
                                 trackBy="name"
                                 multiple
-                                selectionLabel={props => {
-                                    return props?.map((item, index) => {
-                                        return (
-                                            <span key={index}>
-                                                <strong>{item?.name}</strong> - {item?.language}
-                                                {'; '}
-                                            </span>
-                                        );
-                                    });
-                                }}
+                                // selectionLabel={props => {
+                                //     return props?.map((item, index) => {
+                                //         return (
+                                //             <span key={index}>
+                                //                 <strong>{item?.name}</strong> - {item?.language}
+                                //                 {'; '}
+                                //             </span>
+                                //         );
+                                //     });
+                                // }}
                                 options={arrayDATA1}
                                 value={arrayDataSelected}
                                 onGetValues={onGetValues1}

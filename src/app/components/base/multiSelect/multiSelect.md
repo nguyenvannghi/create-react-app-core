@@ -2,20 +2,20 @@
 
 #### 🚀 usage:
 
-    const  arrayDATA  = [
-    		{ name: 'Vue.js', language: 'JavaScript' },
-    		{ name: 'Rails', language: 'Ruby' },
-    		{ name: 'Sinatra', language: 'Ruby' },
-    		{ name: 'Laravel', language: 'PHP' },
-    		{ name: 'Phoenix', language: 'Elixir' },
+    const  options  = [
+    		{ key: 'Vue.js', value: 'JavaScript' },
+    		{ key: 'Rails', value: 'Ruby' },
+    		{ key: 'Sinatra', value: 'Ruby' },
+    		{ key: 'Laravel', value: 'PHP' },
+    		{ key: 'Phoenix', value: 'Elixir' },
     ];
 
-    <MultiSelect label="name" trackBy="name"  options={arrayDATA} onGetValues={onGetValues}  />
+    <MultiSelect options={options} />
 
 #### 🚀 props:
 
 | **Name**           | **Type**              | **Default**                                            | **Description**                                                                                                            |
-| ------------------ | --------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| :----------------- | :-------------------- | :----------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------- |
 | **multiple**       | `Boolean`             | false                                                  | Equivalent to the multiple attribute on a `<select>` input.                                                                |
 | **options**        | `Array`               | []                                                     | Array of available options: Objects, Strings or Integers. If array of objects, visible label will default to option.value. |
 | **trackBy**        | `String`              | key                                                    | Used to compare objects.                                                                                                   |
