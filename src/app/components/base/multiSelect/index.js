@@ -110,7 +110,7 @@ const MultiSelect = props => {
         [setOptionSelected, trackBy],
     );
 
-    const pushSingleOption = useCallback(
+    const pushSingleObjectOption = useCallback(
         data => {
             setOptionSelected(draft => {
                 const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
@@ -143,11 +143,11 @@ const MultiSelect = props => {
             if (multiple) {
                 pushMultiOption(data);
             } else {
-                pushSingleOption(data);
+                pushSingleObjectOption(data);
                 dispatch({ type: RESET });
             }
         },
-        [dispatch, multiple, pushMultiOption, pushSingleOption],
+        [dispatch, multiple, pushMultiOption, pushSingleObjectOption],
     );
 
     const onSelect = (e, data) => {
@@ -178,10 +178,12 @@ const MultiSelect = props => {
         target && target.classList && target.classList.remove(CLASSLIST.HIGHLIGHT);
     };
 
-    const selectionMultiViewRender = () => selectionLabel || (optionSelected.length > 0 && `${optionSelected.length} options selected`);
+    const selectionMultiViewRender = () =>
+        selectionLabel(optionSelected) || (optionSelected.length > 0 && `${optionSelected.length} options selected`);
 
     const selectionViewSingleRender = () => {
-        return selectionLabel || optionSelected[label || trackBy];
+        return selectionLabel({ ...optionSelected });
+        // return selectionLabel || optionSelected[label || trackBy];
     };
 
     const selectionViewRender = () => {
@@ -338,7 +340,7 @@ MultiSelect.propTypes = {
     trackBy: PropTypes.string,
     label: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
-    selectionLabel: PropTypes.node,
+    selectionLabel: PropTypes.func,
     selectLabel: PropTypes.string,
     selectedLabel: PropTypes.string,
     deselectLabel: PropTypes.string,

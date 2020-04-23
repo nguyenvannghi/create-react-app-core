@@ -94,10 +94,10 @@
         border: 1px solid #e8e8e8;
         -webkit-overflow-scrolling: touch;
         top: 100%;
+        margin-top: -1px;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
-        border-top-left-radius: 5px;
-        border-top-right-radius: 5px;
+        border-radius: 5px;
         border-bottom: none;
         border-top: 1px solid #e8e8e8;
         z-index: 999;
@@ -175,14 +175,30 @@
         .multiselect_select {
             transform: rotate(180deg);
         }
+        .multiselect_tags {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
         > .multiselect_content-wrapper {
             display: block;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
         }
     }
     &.multiselect-above {
+        .multiselect_tags {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
         > .multiselect_content-wrapper {
             top: inherit;
             bottom: 100%;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
         }
     }
 }

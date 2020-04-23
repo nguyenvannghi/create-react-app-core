@@ -47,13 +47,11 @@ const Home = () => {
                             <MultiSelect
                                 options={arrayDATA2}
                                 onGetValues={onGetValues2}
-                                selectionLabel={
-                                    state2 && (
-                                        <a>
-                                            {state2.key} - {state2.value}
-                                        </a>
-                                    )
-                                }
+                                selectionLabel={props => (
+                                    <span>
+                                        <strong>{props?.key}</strong> - {props?.value}
+                                    </span>
+                                )}
                             />
                             <pre className="language-json mt-4">
                                 <code className=" language-json">{JSON.stringify(state2)}</code>
@@ -74,15 +72,16 @@ const Home = () => {
                                 label="name"
                                 trackBy="name"
                                 multiple
-                                selectionLabel={
-                                    state1 &&
-                                    state1.map((item, index) => (
-                                        <a key={index}>
-                                            {'/'}
-                                            {item.name} - {item.language}
-                                        </a>
-                                    ))
-                                }
+                                selectionLabel={props => {
+                                    return props?.map((item, index) => {
+                                        return (
+                                            <span key={index}>
+                                                <strong>{item?.name}</strong> - {item?.language}
+                                                {'; '}
+                                            </span>
+                                        );
+                                    });
+                                }}
                                 options={arrayDATA1}
                                 value={arrayDataSelected}
                                 onGetValues={onGetValues1}
