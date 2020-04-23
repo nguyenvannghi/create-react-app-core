@@ -166,13 +166,17 @@ const MultiSelect = props => {
         return optionSelected[trackBy] === data ? 1 : -1;
     };
 
+    const onCheckHighlight = data => {
+        if (!optionHoveredRef.current) {
+            return -1;
+        }
+        return optionHoveredRef.current[trackBy] === data ? 1 : -1;
+    };
+
     const onMouseOverEnter = (e, data) => {
         optionHoveredRef.current = data;
         const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
-        target &&
-            target.classList &&
-            // Array.from(target.classList).indexOf(CLASSLIST.HIGHLIGHT) === -1 &&
-            target.classList.add(CLASSLIST.HIGHLIGHT);
+        target && target.classList && target.classList.add(CLASSLIST.HIGHLIGHT);
     };
     const onMouseLeave = (e, data) => {
         const target = document.getElementById(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${data[trackBy]}`);
@@ -180,11 +184,13 @@ const MultiSelect = props => {
     };
 
     const selectionMultiViewRender = () => {
-        return selectionLabel ? selectionLabel(optionSelected) : optionSelected.length > 0 && `${optionSelected.length} options selected`;
+        return typeof selectionLabel === 'function'
+            ? selectionLabel(optionSelected)
+            : optionSelected.length > 0 && `${optionSelected.length} options selected`;
     };
 
     const selectionViewSingleRender = () => {
-        return selectionLabel ? selectionLabel({ ...optionSelected }) : optionSelected[label || trackBy];
+        return typeof selectionLabel === 'function' ? selectionLabel({ ...optionSelected }) : optionSelected[label || trackBy];
     };
 
     const selectionViewRender = () => {
@@ -211,6 +217,7 @@ const MultiSelect = props => {
                             CLASSLIST.OPTION,
                             `${CLASSLIST.OPTION}-${elementKeyRef.current}-${item[trackBy]}`,
                             onCheckSelected(item[trackBy]) > -1 && CLASSLIST.SELECTED,
+                            onCheckHighlight(item[trackBy]) > -1 && CLASSLIST.HIGHLIGHT,
                         )}
                         id={classNames(`${CLASSLIST.OPTION}-${elementKeyRef.current}-${item[trackBy]}`)}
                         onClick={event => onSelect(event, item)}>
@@ -223,7 +230,8 @@ const MultiSelect = props => {
                 <span className="multiselect_option">{noResult}</span>
             </li>
         );
-    }, [optionBuilt, trackBy]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [optionBuilt, trackBy, onCheckSelected, onCheckHighlight]);
 
     const noOptionsRender = () => (
         <li className="multiselect_element">
@@ -272,7 +280,7 @@ const MultiSelect = props => {
     }, [handleAbove]);
 
     useEffect(() => {
-        onGetValues(optionSelected);
+        typeof onGetValues === 'function' && onGetValues(optionSelected);
     }, [optionSelected, onGetValues]);
 
     return (
