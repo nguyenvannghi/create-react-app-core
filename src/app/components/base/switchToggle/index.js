@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 const SwitchToggle = props => {
-    const { className, tag: Element, size, variant, disabled, required, name, value, id, onChange } = props;
+    const { className, tag: Element, size, variant, disabled, required, name, value, id, ref, onChange } = props;
     const classes = classNames('switch', className, variant && `switch-${variant}`, size && `switch-${size}`);
     const handleChange = event => {
         if (typeof onChange === 'function') {
@@ -16,7 +16,16 @@ const SwitchToggle = props => {
 
     return (
         <Element className={classes} htmlFor={id}>
-            <input type="checkbox" id={id} name={name} value={value} disabled={disabled} required={required} onChange={handleChange} />
+            <input
+                type="checkbox"
+                ref={ref}
+                id={id}
+                name={name}
+                value={value}
+                disabled={disabled}
+                required={required}
+                onChange={handleChange}
+            />
             <span className="slider round" />
         </Element>
     );
@@ -40,6 +49,7 @@ SwitchToggle.propTypes = {
     name: PropTypes.string,
     value: PropTypes.any,
     id: PropTypes.string,
+    ref: PropTypes.node,
     onChange: PropTypes.func,
 };
 

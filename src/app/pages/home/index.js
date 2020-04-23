@@ -35,7 +35,7 @@ const Home = () => {
         setstate2(() => data);
     };
     return (
-        <div style={{ paddingTop: '10%', paddingBottom: '20%' }}>
+        <div>
             <Row>
                 <Col xl="6">
                     <Card className="mb-5">
@@ -44,7 +44,7 @@ const Home = () => {
                             <Card.Text>The basic single select / dropdown doesn’t require much configuration.</Card.Text>
                         </Card.Header>
                         <Card.Body>
-                            {/* <MultiSelect
+                            <MultiSelect
                                 options={arrayDATA2}
                                 onGetValues={onGetValues2}
                                 selectionLabel={props => (
@@ -52,7 +52,7 @@ const Home = () => {
                                         <strong>{props?.key}</strong> - {props?.value}
                                     </span>
                                 )}
-                            /> */}
+                            />
                             <pre className="language-json mt-4">
                                 <code className=" language-json">{JSON.stringify(state2)}</code>
                             </pre>
