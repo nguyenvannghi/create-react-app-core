@@ -35,7 +35,7 @@ const AppRoutes = () => {
             <DefaultLayout>
                 <Switch>
                     {routerListNav(RouteNavConfig)}
-                    <Redirect path="*" to={RouterApp.rHome} />
+                    <Redirect path="*" to={RouterApp.rFileManager} />
                 </Switch>
             </DefaultLayout>
         </ConnectedRouter>

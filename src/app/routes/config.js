@@ -2,11 +2,13 @@ import AsyncComponent from 'app/components/asyncComponent';
 import RouterApp from './consts';
 
 const AsyncHome = AsyncComponent(() => import('app/pages/home/index'));
+const AsyncFileManager = AsyncComponent(() => import('app/pages/fileManager/index'));
 const AsyncCategories = AsyncComponent(() => import('app/pages/categories/index'));
 const AsyncCategory = AsyncComponent(() => import('app/pages/categories/category/index'));
 const AsyncCategoryDetail2 = AsyncComponent(() => import('app/pages/categories/category-detail2/index'));
 const AsyncStandardTable = AsyncComponent(() => import('app/pages/tables/standardTable/index'));
 const AsyncDataTable = AsyncComponent(() => import('app/pages/tables/dataTable/index'));
+const AsyncFormInputs = AsyncComponent(() => import('app/pages/forms/basicInputs/index'));
 
 const RouteNavConfig = [
     {
@@ -15,6 +17,13 @@ const RouteNavConfig = [
         path: RouterApp.rHome,
         exact: true,
         component: AsyncHome,
+    },
+    {
+        title: 'File Manager',
+        icon: 'icon-picture',
+        path: RouterApp.rFileManager,
+        exact: true,
+        component: AsyncFileManager,
     },
     {
         title: 'Title',
@@ -50,12 +59,9 @@ const RouteNavConfig = [
         exact: true,
         children: [
             {
-                title: 'Layouts',
-                path: `${RouterApp.rForm}/form-layouts`,
-            },
-            {
                 title: 'Basic Inputs',
                 path: `${RouterApp.rForm}/basic-inputs`,
+                component: AsyncFormInputs,
             },
             {
                 title: 'Input Groups',
