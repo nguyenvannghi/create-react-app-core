@@ -7,9 +7,9 @@ import { SidebarNav, SidebarBrand, HeaderNav, Content, Footer, NavBreadcrumb } f
 import RouteNavConfig from 'app/routes/config';
 import { makeSelectSidebarToggle } from 'app/redux/common/selector';
 
-const DefaultLayout = ({ children }) => {
-    const isToogle = useSelector(makeSelectSidebarToggle());
-    const classes = classNames('sidebar', isToogle && 'sidebar-show');
+const PrimaryLayout = ({ children }) => {
+    const isToggle = useSelector(makeSelectSidebarToggle());
+    const classes = classNames('sidebar', isToggle && 'sidebar-show');
 
     return (
         <div className="app-body">
@@ -31,8 +31,8 @@ const DefaultLayout = ({ children }) => {
     );
 };
 
-DefaultLayout.propTypes = {
+PrimaryLayout.propTypes = {
     children: PropTypes.node,
 };
 
-export default DefaultLayout;
+export default PrimaryLayout;

@@ -1,29 +1,45 @@
-import AsyncComponent from 'app/components/asyncComponent';
+import PrimaryLayout from 'app/layouts/primaryLayout';
+import AuthLayout from 'app/layouts/authLayout';
 import RouterApp from './consts';
-
-const AsyncHome = AsyncComponent(() => import('app/pages/home/index'));
-const AsyncFileManager = AsyncComponent(() => import('app/pages/fileManager/index'));
-const AsyncCategories = AsyncComponent(() => import('app/pages/categories/index'));
-const AsyncCategory = AsyncComponent(() => import('app/pages/categories/category/index'));
-const AsyncCategoryDetail2 = AsyncComponent(() => import('app/pages/categories/category-detail2/index'));
-const AsyncStandardTable = AsyncComponent(() => import('app/pages/tables/standardTable/index'));
-const AsyncDataTable = AsyncComponent(() => import('app/pages/tables/dataTable/index'));
-const AsyncFormInputs = AsyncComponent(() => import('app/pages/forms/basicInputs/index'));
+import {
+    AsyncLogin,
+    AsyncRegister,
+    AsyncHome,
+    AsyncCategories,
+    AsyncCategory,
+    AsyncCategoryDetail2,
+    AsyncStandardTable,
+    AsyncDataTable,
+    AsyncFormInputs,
+} from './asyncComponent';
 
 const RouteNavConfig = [
+    {
+        title: 'Page',
+    },
     {
         title: 'Home',
         icon: 'icon-user',
         path: RouterApp.rHome,
         exact: true,
         component: AsyncHome,
+        layout: PrimaryLayout,
     },
     {
-        title: 'File Manager',
-        icon: 'icon-picture',
-        path: RouterApp.rFileManager,
+        title: 'Login',
+        icon: 'icon-login',
+        path: RouterApp.rLogin,
         exact: true,
-        component: AsyncFileManager,
+        component: AsyncLogin,
+        layout: AuthLayout,
+    },
+    {
+        title: 'Register',
+        icon: 'icon-user-follow',
+        path: RouterApp.rRegister,
+        exact: true,
+        component: AsyncRegister,
+        layout: AuthLayout,
     },
     {
         title: 'Title',
@@ -34,6 +50,7 @@ const RouteNavConfig = [
         icon: 'icon-grid',
         path: RouterApp.rCategories,
         component: AsyncCategories,
+        layout: PrimaryLayout,
         children: [
             {
                 title: 'Category Level 1',
@@ -57,6 +74,7 @@ const RouteNavConfig = [
         icon: 'icon-disc',
         path: RouterApp.rForm,
         exact: true,
+        layout: PrimaryLayout,
         children: [
             {
                 title: 'Basic Inputs',
@@ -74,6 +92,7 @@ const RouteNavConfig = [
         icon: 'icon-grid',
         path: RouterApp.rTable,
         exact: true,
+        layout: PrimaryLayout,
         children: [
             {
                 title: 'Standard Table',

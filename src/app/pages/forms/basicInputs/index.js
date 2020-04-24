@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import { MultiSelect, Checkbox } from 'app/components/base';
+import { MultiSelect } from 'app/components/base';
 import { SINGLE_DATA, MULTI_DATA, MULTI_DATA_SELECTED } from './mock';
 
 const BasicInputs = () => {

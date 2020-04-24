@@ -1,12 +1,14 @@
 const rHome = '/';
-const rFileManager = '/file-manager';
+const rLogin = '/login';
+const rRegister = '/register';
 const rCategories = '/categories';
 const rTable = '/tables';
 const rForm = '/forms';
 
 const RouterApp = {
     rHome,
-    rFileManager,
+    rLogin,
+    rRegister,
     rCategories,
     rTable,
     rForm,
