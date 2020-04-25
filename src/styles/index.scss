@@ -6,6 +6,7 @@
 @import 'scss/sidebarBrand.scss';
 @import 'scss/header.scss';
 @import 'scss/footer.scss';
+@import 'scss/login.scss';
 @import 'scss/custom.scss';
 
 html,
@@ -48,7 +49,7 @@ body {
         position: fixed;
         z-index: 1019;
         height: 100vh;
-        background-color: $sidebar-color;
+        background-color: $bg-color;
     }
     .main {
         display: flex;

@@ -3,12 +3,15 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { IntlProvider } from 'react-intl-redux';
 import { initialLocalization } from 'app/utils/localization';
+import configFakeBackend from 'app/services/fakeBackend';
 import AppRoutes from 'app/routes';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'simple-line-icons/css/simple-line-icons.css';
 import './styles/index.scss';
 import store from './app/redux/store';
 import * as serviceWorker from './serviceWorker';
+
+configFakeBackend();
 
 ReactDOM.render(
     <Provider store={store(initialLocalization)}>
