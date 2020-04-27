@@ -1,6 +1,6 @@
 import handleResponse from 'app/services/fakeHandleResponse';
 
-const login = (username, password) => {
+const loginApi = (username, password) => {
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -10,10 +10,6 @@ const login = (username, password) => {
     return fetch('/users/authenticate', requestOptions)
         .then(handleResponse)
         .then(user => {
-            console.log(user);
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
-            localStorage.setItem('currentUser', JSON.stringify(user));
-
             return user;
         });
 };
@@ -23,4 +19,4 @@ const logout = () => {
     localStorage.removeItem('currentUser');
 };
 
-export { login, logout };
+export { loginApi, logout };

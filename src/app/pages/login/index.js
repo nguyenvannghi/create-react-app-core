@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useForm, ErrorMessage } from 'react-hook-form';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -8,20 +10,24 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import RouterApp from 'app/routes/consts';
-import { useForm, ErrorMessage } from 'react-hook-form';
+import injectReducerSaga from 'app/redux/injectReducerSaga';
+import { KEY_REDUCER_SAGA } from './redux/consts';
+import userSaga from './redux/saga';
+import userReducer from './redux/reducer';
+import { onLoginCall } from './redux/actions';
 import FIELD_LOGIN from './const';
 import LoginSchema from './validator';
-import { login } from './api';
 
 const Login = () => {
+    injectReducerSaga(KEY_REDUCER_SAGA, userReducer, userSaga);
+    const dispatch = useDispatch();
     const { register, handleSubmit, errors } = useForm({
         mode: 'onChange',
         validationSchema: LoginSchema,
     });
 
     const handleLogin = data => {
-        const { username, password } = data;
-        login(username, password);
+        dispatch(onLoginCall(data));
     };
 
     return (

@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import * as router from 'react-router-dom';
-import { SidebarNav, SidebarBrand, HeaderNav, Content, Footer, NavBreadcrumb } from 'app/components/base';
-import RouteNavConfig from 'app/routes/config';
+import { SidebarPermissionNav, SidebarBrand, HeaderNav, Content, Footer, NavBreadcrumb } from 'app/components/base';
+import { RouteNavConfig } from 'app/routes/config';
 import { makeSelectSidebarToggle } from 'app/redux/common/selector';
 
 const PrimaryLayout = ({ children }) => {
@@ -15,7 +15,7 @@ const PrimaryLayout = ({ children }) => {
         <div className="app-body">
             <div className={classes}>
                 <SidebarBrand />
-                <SidebarNav navigation={RouteNavConfig} />
+                <SidebarPermissionNav navigation={RouteNavConfig} />
             </div>
             <div className="main">
                 <div className="inner-main">
