@@ -10,7 +10,7 @@ const AppRoutes = () => {
     const routesMatch = [];
 
     const onceRouter = route => {
-        const { component: Component, layout: Layout = PrimaryLayout, path, exact } = route;
+        const { component: Component, layout: Layout = PrimaryLayout, path, exact, redirect } = route;
         return Component ? (
             <Route
                 key={Math.random()
@@ -19,9 +19,12 @@ const AppRoutes = () => {
                 path={path}
                 exact={exact}
                 render={props => (
-                    <Layout>
-                        <Component {...props} />
-                    </Layout>
+                    <>
+                        <Layout>
+                            <Component {...props} />
+                        </Layout>
+                        {redirect && <Redirect from={path} to={redirect} />}
+                    </>
                 )}
             />
         ) : (

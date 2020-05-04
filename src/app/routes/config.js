@@ -49,6 +49,7 @@ const RouteNavConfig = [
         title: 'Categories',
         icon: 'icon-grid',
         path: RouterApp.rCategories,
+        redirect: `${RouterApp.rCategories}/detail`,
         component: AsyncCategories,
         layout: PrimaryLayout,
         children: [
