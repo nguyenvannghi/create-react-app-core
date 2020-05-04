@@ -1,6 +1,25 @@
+//  find: 2,
+//  findone: 1,
+//  create: 4,
+//  update: 8,
+//  destroy: 16,
+
 const users = [
     { id: 1, username: 'admin', password: 'admin', firstName: 'Admin', lastName: 'User' },
     { id: 2, username: 'user', password: 'user', firstName: 'Normal', lastName: 'User' },
+];
+
+const tokens = [
+    {
+        id: 1,
+        token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODgzNjEwNzYsImlhdCI6MTU4Nzc5MjI3NiwiaWQiOjQxNDMsInVzZXJuYW1lIjoiYWRtaW4iLCJwZXJtaXNzaW9ucyI6eyJuZXdzIjo3LCJjYXRlZ29yaWVzIjozLCJwcm9kdWN0cyI6IjYzIn0sImlzX2FkbWluIjp0cnVlLCJkZXZpY2VfaWQiOiI5NGY4ZTM4YS1mOTFmLTQ0MWYtYjAwYi00MmQ5ZGViZjIxZWIifQ.4GdQ25Wot6qpia0MVY6h00D54ked1HuQse8p483cegk',
+    },
+    {
+        id: 2,
+        token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODgzNjEwNzYsImlhdCI6MTU4Nzc5MjI3NiwiaWQiOjQxNDMsInVzZXJuYW1lIjoiYWRtaW4iLCJwZXJtaXNzaW9ucyI6eyJuZXdzIjo3LCJjYXRlZ29yaWVzIjozfSwiaXNfYWRtaW4iOnRydWUsImRldmljZV9pZCI6Ijk0ZjhlMzhhLWY5MWYtNDQxZi1iMDBiLTQyZDlkZWJmMjFlYiJ9.4SYSkT9FGf0itXksGdp1kMUzAo5jP5dDNOoZrTOZ4aI',
+    },
 ];
 
 const configFakeBackend = () => {
@@ -34,7 +53,7 @@ const configFakeBackend = () => {
                     username: user.username,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    token: 'fake-jwt-token',
+                    token: tokens[user.id].token,
                 });
             }
 
@@ -64,7 +83,7 @@ const configFakeBackend = () => {
             }
 
             function ok(body) {
-                resolve({ ok: true, text: () => Promise.resolve(JSON.stringify(body)) });
+                resolve({ ok: true, text: () => Promise.resolve(JSON.stringify({ data: body })) });
             }
 
             function unauthorized() {

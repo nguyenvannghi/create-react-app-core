@@ -2,13 +2,12 @@ import React, { Fragment } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import PrimaryLayout from 'app/layouts/primaryLayout';
-import history from './history';
-import RouteNavConfig from './config';
+import history from 'app/routes/history';
+import { RouteNavConfig } from './config';
 import RouterApp from './consts';
 
 const AppRoutes = () => {
     const routesMatch = [];
-
     const onceRouter = route => {
         const { component: Component, layout: Layout = PrimaryLayout, path, exact, redirect } = route;
         return Component ? (
